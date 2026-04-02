@@ -103,7 +103,7 @@ The learning journey is structured in **phases** — each one building on the la
 |---|---|
 | End-to-End Projects | Full DS workflow from data to deployment |
 | Feature Engineering | Building better inputs for better models |
-| Specialization | NLP, Computer Vision, or Generative AI |
+| Specialization | NLP, Computer Vision, or Artificial Neural Networks |
 | Deployment | Serving models in the real world |
 
 ---
