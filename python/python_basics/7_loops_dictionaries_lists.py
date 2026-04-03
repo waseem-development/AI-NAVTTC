@@ -1,3 +1,4 @@
+# This is incomplete
 data = {
     1: {"name": "Waseem"},
     2: {"scores": [85, 90, 78]}
@@ -17,7 +18,7 @@ data.update({3: {"age": 23}})
 
 users = [
     {"name": "Waseem", "age": 22},
-    {"name": "Lamiah", "age": 25}
+    {"name": "Agha", "age": 25}
 ]
 
 users.append({"name": "Summiya", "age": 26})
