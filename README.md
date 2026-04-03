@@ -195,13 +195,6 @@ The path ahead is long. This repo documents the walk.
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api?username=waseem-development&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=a78bfa&icon_color=6366f1&text_color=e2e8f0" height="160"/>
-&nbsp;&nbsp;
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=waseem-development&layout=compact&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=a78bfa&text_color=e2e8f0" height="160"/>
-
-</div>
-
-<br>
 
 > This repo is part of my **NAVTTC AI training program**, **university coursework**, and self-study from world-class sources like **MIT OpenCourseWare** and **Stanford Online**. The work here is personal, hands-on, and built from scratch.
 
