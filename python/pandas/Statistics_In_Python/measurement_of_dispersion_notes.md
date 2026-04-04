@@ -66,11 +66,11 @@ print(age_range)  # Output: 79.58
 
 ### 🚦 Dos and Don'ts
 
-| ✅ DO                                        | ❌ DON'T                          |
-| -------------------------------------------- | --------------------------------- |
-| Use as a first glance at spread              | Rely on it as your*only*measure |
-| Remove NaN values before computing           | Forget to handle missing values   |
-| Pair it with other measures for full picture | Use when outliers are present     |
+| ✅ DO                                        | ❌ DON'T                                   |
+| -------------------------------------------- | ------------------------------------------ |
+| Use as a first glance at spread              | Rely on it as your **only** measure |
+| Remove NaN values before computing           | Forget to handle missing values            |
+| Pair it with other measures for full picture | Use when outliers are present              |
 
 ---
 
