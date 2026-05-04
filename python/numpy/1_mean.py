@@ -7,3 +7,7 @@ mode = stats.mode(my_data).mode
 print(f"mean: {mean}")
 print(f"median: {median}")
 print(f"mode: {mode}")
+
+
+print("My data =", my_data, mean, median, mode)
+print(f"My data = {my_data} {mean}, {median} {mode}")
