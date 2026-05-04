@@ -27,16 +27,13 @@ while True:
     print("Image loaded and converted to grayscale.")
 
     while True:
-        print("\n1) Show image")
-        print("2) Save image")
-        print("3) Load a new image")
-        print("4) Exit")
+        print("\n1) Show image\n2) Save image\n3) Load a new image\n4) Exit")
 
         choice = input("Enter choice: ").strip()
 
         if choice == '1':
             try:
-                cv2.imshow("Grayscale", gray)
+                cv2.imshow("Grayscale Image", gray)
                 cv2.waitKey(0)
                 cv2.destroyAllWindows()
             except:
