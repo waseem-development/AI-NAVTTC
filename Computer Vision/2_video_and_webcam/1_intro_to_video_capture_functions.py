@@ -143,7 +143,7 @@
 
 import cv2
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("videos/recitation.mp4")
 
 while True:
     ret, frame = cap.read() # ret means return: ret=True/False, frame=image
