@@ -4,6 +4,7 @@ count = 0
 
 while count < 20:
     if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
-        print(year)
+        print(year, " ", end="")
         count += 1
     year += 1
+print()
