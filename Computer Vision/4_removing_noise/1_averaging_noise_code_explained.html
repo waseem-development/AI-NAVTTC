@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convolution — Interactive Dark Explainer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0f12;
+  --surface: #141720;
+  --surface2: #1c2030;
+  --border: #252a3a;
+  --ink: #e8eaf0;
+  --muted: #6b7280;
+  --accent: #4ade80;
+  --accent2: #60a5fa;
+  --accent3: #f97316;
+  --accent4: #a78bfa;
+  --accent5: #fb7185;
+  --code-bg: #0a0c10;
+  --glow: rgba(74,222,128,0.12);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Syne', sans-serif;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* Topbar */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.6rem 2rem;
+  letter-spacing: 0.07em;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.topbar strong { color: var(--accent); }
+.topbar span:last-child { color: var(--accent2); }
+
+/* Layout */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 8rem;
+}
+
+/* Hero */
+.hero {
+  margin-bottom: 4rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.6s ease both;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.hero h1 span { color: var(--accent); }
+.hero p { color: var(--muted); font-size: 1rem; max-width: 580px; font-weight: 400; }
+.hero code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  background: var(--surface2);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  color: var(--accent3);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Sections */
+.section {
+  margin-bottom: 3.5rem;
+  animation: fadeUp 0.5s ease both;
+}
+.section:nth-child(2) { animation-delay: 0.1s; }
+.section:nth-child(3) { animation-delay: 0.15s; }
+.section:nth-child(4) { animation-delay: 0.2s; }
+.section:nth-child(5) { animation-delay: 0.25s; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.section-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Code block */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.9;
+  margin-bottom: 1.2rem;
+  overflow-x: auto;
+  color: #b0bec5;
+  position: relative;
+}
+.c-comment { color: #3d4a5a; font-style: italic; }
+.c-fn { color: var(--accent); }
+.c-num { color: var(--accent3); }
+.c-str { color: var(--accent2); }
+.c-kw { color: var(--accent4); }
+.c-var { color: #e8eaf0; }
+
+/* Def cards */
+.def-grid { display: grid; gap: 0.8rem; }
+.def-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 1.1rem;
+  transition: border-color 0.2s;
+}
+.def-card:hover { border-color: var(--accent); }
+.def-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2em 0.55em;
+  border-radius: 4px;
+  height: fit-content;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+}
+.tag-concept { background: rgba(96,165,250,0.12); color: var(--accent2); border: 1px solid rgba(96,165,250,0.2); }
+.tag-param   { background: rgba(249,115,22,0.12); color: var(--accent3); border: 1px solid rgba(249,115,22,0.2); }
+.tag-line    { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.2); }
+.tag-why     { background: rgba(167,139,250,0.12); color: var(--accent4); border: 1px solid rgba(167,139,250,0.2); }
+.tag-result  { background: rgba(251,113,133,0.12); color: var(--accent5); border: 1px solid rgba(251,113,133,0.2); }
+.tag-warning { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+
+.def-term {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.def-text { font-size: 0.9rem; color: #9ca3af; line-height: 1.65; font-weight: 400; }
+.def-text code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  background: var(--surface2);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  color: var(--accent3);
+}
+.hl-green  { color: var(--accent); font-weight: 600; }
+.hl-orange { color: var(--accent3); font-weight: 600; }
+.hl-blue   { color: var(--accent2); font-weight: 600; }
+.hl-red    { color: var(--accent5); font-weight: 600; }
+.hl-purple { color: var(--accent4); font-weight: 600; }
+
+/* Analogy */
+.analogy {
+  border-left: 3px solid var(--accent3);
+  background: rgba(249,115,22,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  font-size: 0.86rem;
+  color: #c4a07a;
+  margin-top: 0.8rem;
+}
+.analogy strong { color: var(--accent3); font-style: normal; }
+
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+/* ───── INTERACTIVE CONVOLUTION WIDGET ───── */
+.interactive-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  margin: 1.5rem 0;
+}
+.interactive-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.interactive-box p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1.2rem;
+  font-weight: 400;
+}
+
+/* Signal array display */
+.array-display {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+  min-height: 48px;
+}
+.arr-cell {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.arr-cell.highlight {
+  background: rgba(74,222,128,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(74,222,128,0.3);
+}
+.arr-cell.kernel-active {
+  background: rgba(96,165,250,0.2);
+  border-color: var(--accent2);
+  color: var(--accent2);
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(96,165,250,0.4);
+}
+.arr-cell.output-cell {
+  background: rgba(249,115,22,0.15);
+  border-color: var(--accent3);
+  color: var(--accent3);
+}
+.arr-cell.output-cell.active-out {
+  background: rgba(249,115,22,0.3);
+  box-shadow: 0 0 12px rgba(249,115,22,0.5);
+  transform: scale(1.1);
+}
+
+.arr-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.05em;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--ink);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: #0d0f12; border-color: var(--accent); font-weight: 700; }
+.btn.primary:hover { background: #22c55e; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.step-info {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.6rem;
+  min-height: 1.4rem;
+}
+.step-info .calc { color: var(--accent2); }
+.step-info .result-val { color: var(--accent3); font-weight: 600; }
+
+/* Speed slider */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+input[type=range] {
+  -webkit-appearance: none;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  height: 6px;
+  width: 120px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+/* STEP-BY-STEP Math breakdown */
+.math-breakdown {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  margin-top: 1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 2;
+  min-height: 3.5rem;
+  color: var(--muted);
+  transition: all 0.3s;
+}
+.math-breakdown .step-line { color: var(--ink); }
+.math-breakdown .mul-pair { color: var(--accent2); }
+.math-breakdown .plus { color: var(--muted); }
+.math-breakdown .eq-result { color: var(--accent3); font-weight: 600; font-size: 0.9rem; }
+
+/* Live chart canvas */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem;
+  margin: 1.5rem 0;
+}
+.chart-wrap canvas { display: block; width: 100%; }
+.chart-legend {
+  display: flex;
+  gap: 1.4rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.legend-dot { width: 10px; height: 3px; border-radius: 2px; }
+
+/* Kernel type selector */
+.kernel-selector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.8rem 0;
+}
+.k-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.k-btn.active { border-color: var(--accent4); color: var(--accent4); background: rgba(167,139,250,0.1); }
+
+/* Kernel weight boxes */
+.kernel-vis {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0.8rem 0;
+  align-items: center;
+}
+.k-box {
+  width: 56px; height: 56px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(96,165,250,0.08);
+  gap: 2px;
+  transition: all 0.3s;
+}
+.k-box.center { border-color: var(--accent2); background: rgba(96,165,250,0.18); }
+.k-box .k-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 600; color: var(--accent2); }
+.k-box .k-pct { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--muted); }
+.k-sum { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent); margin-left: 0.4rem; }
+
+/* Window size slider */
+.window-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.8rem 0 1.2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.window-val {
+  color: var(--accent3);
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 1.5rem;
+}
+
+/* Mode boxes */
+.mode-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+.mode-box {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-box:hover { border-color: var(--muted); }
+.mode-box.active { border-color: var(--accent); background: rgba(74,222,128,0.05); }
+.mode-box .mode-name { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.35rem; }
+.mode-box .mode-name.same { color: var(--accent); }
+.mode-box .mode-name.full { color: var(--accent5); }
+.mode-box .mode-name.valid { color: var(--accent2); }
+.mode-box p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; font-weight: 400; }
+.mode-box .mode-len { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; margin-top: 0.35rem; }
+
+/* Summary */
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-top: 3rem;
+}
+.summary h2 { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 1.2rem; letter-spacing: -0.01em; }
+.summary-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 0.3rem 1.2rem;
+  font-size: 0.84rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-key { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--accent); padding-top: 0.1rem; }
+.summary-val { color: var(--muted); line-height: 1.5; font-weight: 400; font-size: 0.86rem; }
+
+/* Bell canvas */
+.bell-visual {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.4rem;
+  margin-bottom: 1rem;
+}
+.bell-visual canvas { display: block; width: 100%; }
+
+/* Noise level demo */
+.noise-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.3rem;
+  margin: 1rem 0;
+}
+.noise-demo label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.noise-demo .noise-val { color: var(--accent3); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span><strong>convolution_explained.py</strong> — interactive dark edition</span>
+  <span>Simple Moving Average · NumPy · Live Demo</span>
+</div>
+
+<div class="page">
+
+  <div class="hero">
+    <h1>Convolution,<br><span>finally clear.</span></h1>
+    <p>An interactive walkthrough of <code>np.convolve</code> — with live step-by-step animation, sliders, and a real-time chart. Play with it until it clicks.</p>
+  </div>
+
+  <!-- ── SECTION 1 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01 —</span>
+      <span class="section-title">Imports</span>
+    </div>
+    <div class="code-block">
+<span class="c-kw">import</span> <span class="c-fn">numpy</span> <span class="c-kw">as</span> <span class="c-var">np</span> <br>
+<span class="c-kw">import</span> <span class="c-fn">matplotlib.pyplot</span> <span class="c-kw">as</span> <span class="c-var">plt</span>
+    </div>
+    <div class="def-grid">
+      <div class="def-card">
+        <span class="def-tag tag-concept">library</span>
+        <div>
+          <div class="def-term">numpy (np)</div>
+          <div class="def-text">The math engine. Gives you arrays, random numbers, and operations like <code>np.convolve()</code>. <code>np</code> is just a short nickname.</div>
+        </div>
+      </div>
+      <div class="def-card">
+        <span class="def-tag tag-concept">library</span>
+        <div>
+          <div class="def-term">matplotlib.pyplot (plt)</div>
+          <div class="def-text">The graph drawer. <code>plt.plot()</code> draws lines. <code>plt.show()</code> opens the window. <code>plt</code> is the nickname.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── SECTION 2 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02 —</span>
+      <span class="section-title">Creating the clean signal</span>
+    </div>
+    <div class="code-block">
+<span class="c-var">true_signal</span> = <span class="c-fn">np.ones</span>(<span class="c-num">100</span>) * <span class="c-num">90</span>
+    </div>
+    <div class="def-grid">
+      <div class="def-card">
+        <span class="def-tag tag-line">what it does</span>
+        <div>
+          <div class="def-term">np.ones(100) * 90</div>
+          <div class="def-text">Makes an array of <span class="hl-green">100 nineties</span>: <code>[90, 90, 90, …]</code>. A perfectly flat line — no noise, no variation.</div>
+          <div class="analogy"><strong>Real-world analogy:</strong> A machine that should always output exactly 90°C. This is the ideal, perfect temperature.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── SECTION 3 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03 —</span>
+      <span class="section-title">Normal Distribution (Adding Noise)</span>
+    </div>
+    <div class="code-block">
+<span class="c-var">noise</span> = <span class="c-fn">np.random.normal</span>(<span class="c-num">0</span>, <span class="c-num">10</span>, <span class="c-num">100</span>)
+<span class="c-comment"># mean=0  →  centered at zero (noise doesn't push signal up/down)</span>
+<span class="c-comment"># std=10  →  how spread/wild the noise is</span>
+<span class="c-comment"># size=100 → one noise value per signal point</span>
+<span class="c-var">noisy_signal</span> = <span class="c-var">true_signal</span> + <span class="c-var">noise</span>
+    </div>
+
+    <!-- Interactive bell curve -->
+    <div class="noise-demo">
+      <label>Drag to change <strong>std</strong> (noise intensity): <span class="noise-val" id="stdLabel">10</span></label>
+      <input type="range" id="stdSlider" min="1" max="30" value="10" style="width:200px">
+      <div class="bell-visual" style="margin-top:1rem;margin-bottom:0;padding:1rem">
+        <canvas id="bellCanvas" height="120"></canvas>
+        <p style="font-size:0.68rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:0.5rem;text-align:center" id="bellLabel">Bell curve: mean=0, std=10 — 68% of noise falls between −10 and +10</p>
+      </div>
+    </div>
+
+    <div class="def-grid">
+      <div class="def-card">
+        <span class="def-tag tag-concept">concept</span>
+        <div>
+          <div class="def-term">Normal Distribution</div>
+          <div class="def-text">Most random values cluster around the center (mean). Fewer appear as you go further away. Looks like a bell when plotted.</div>
+          <div class="analogy"><strong>Simple version:</strong> Throwing darts aiming at the center — most land near center, very few land far away. That clustering IS the normal distribution.</div>
+        </div>
+      </div>
+      <div class="def-card">
+        <span class="def-tag tag-param">parameter</span>
+        <div>
+          <div class="def-term">0 — mean</div>
+          <div class="def-text">Center of the bell. Mean=0 means noise doesn't bias the signal up or down. Positives and negatives cancel out <span class="hl-blue">on average</span>.</div>
+        </div>
+      </div>
+      <div class="def-card">
+        <span class="def-tag tag-param">parameter</span>
+        <div>
+          <div class="def-term">10 — standard deviation</div>
+          <div class="def-text">Width of the bell — how wild the noise is. <span class="hl-green">std=2</span> is gentle. <span class="hl-orange">std=10</span> is windy. <span class="hl-red">std=30</span> is a storm. Drag the slider above to see.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── SECTION 4 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04 —</span>
+      <span class="section-title">Window size &amp; Kernel</span>
+    </div>
+    <div class="code-block">
+<span class="c-var">window_size</span> = <span class="c-num">5</span>
+<span class="c-var">kernel</span>      = <span class="c-fn">np.ones</span>(<span class="c-var">window_size</span>) / <span class="c-var">window_size</span>
+<span class="c-comment"># np.ones(5) → [1, 1, 1, 1, 1]</span>
+<span class="c-comment"># divide by 5 → [0.2, 0.2, 0.2, 0.2, 0.2]</span>
+    </div>
+
+    <!-- Interactive kernel builder -->
+    <div class="interactive-box">
+      <h3>⬡ interactive kernel explorer</h3>
+      <p>Choose a kernel type and window size. Watch the weights update live.</p>
+
+      <div class="window-control">
+        <span>window_size =</span>
+        <span class="window-val" id="winVal">5</span>
+        <input type="range" id="winSlider" min="3" max="9" step="2" value="5" style="width:120px">
+        <span>(odd numbers only)</span>
+      </div>
+
+      <div class="kernel-selector">
+        <button class="k-btn active" data-ktype="uniform">uniform (equal)</button>
+        <button class="k-btn" data-ktype="gaussian">gaussian (center-weighted)</button>
+        <button class="k-btn" data-ktype="triangle">triangle</button>
+      </div>
+
+      <div class="kernel-vis" id="kernelVis"></div>
+
+      <div class="def-text" id="kernelDesc" style="margin-top:0.3rem; font-size:0.83rem; color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── SECTION 5 — CONVOLUTION DEEP DIVE ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05 —</span>
+      <span class="section-title">np.convolve — the main operation</span>
+    </div>
+    <div class="code-block">
+<span class="c-var">smoothed_signal</span> = <span class="c-fn">np.convolve</span>(
+    <span class="c-var">noisy_signal</span>,
+    <span class="c-var">kernel</span>,
+    mode=<span class="c-str">'same'</span>
+)
+    </div>
+
+    <div class="def-grid" style="margin-bottom:1.2rem">
+      <div class="def-card">
+        <span class="def-tag tag-concept">concept</span>
+        <div>
+          <div class="def-term">convolution — what it actually means</div>
+          <div class="def-text">
+            Convolution = <span class="hl-blue">slide a window across your data</span>. At each position, it:<br><br>
+            1. Looks at N values under the window<br>
+            2. Multiplies each by a kernel weight<br>
+            3. Sums them all up<br>
+            4. Writes that ONE number as output<br>
+            5. Moves one step right → repeat
+          </div>
+          <div class="analogy"><strong>Think of it like:</strong> You're walking along a noisy road. At each step, you look back at the last 5 houses and ask: "what was the average temperature?" That average is your smoothed value. Then you take one step forward and ask again.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BIG INTERACTIVE CONVOLUTION DEMO -->
+    <div class="interactive-box">
+      <h3>▶ step-by-step convolution animation</h3>
+      <p>Watch the kernel window slide across the signal. Each step shows the multiplication and sum.</p>
+
+      <div class="arr-label">noisy_signal (first 12 values shown)</div>
+      <div class="array-display" id="signalArr"></div>
+
+      <div style="margin-top:1rem">
+        <div class="arr-label">kernel (window of weights)</div>
+        <div class="array-display" id="kernelArr"></div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <div class="arr-label">output (smoothed_signal — fills in as we go)</div>
+        <div class="array-display" id="outputArr"></div>
+      </div>
+
+      <div class="math-breakdown" id="mathBreakdown">
+        Press <strong style="color:var(--accent)">Step →</strong> to start the animation and see the math at each position.
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" id="btnStep">Step →</button>
+        <button class="btn" id="btnPlay">▶ Auto-play</button>
+        <button class="btn" id="btnReset">↺ Reset</button>
+        <button class="btn" id="btnRegen">🎲 New signal</button>
+      </div>
+
+      <div class="speed-row">
+        <span>speed:</span>
+        <input type="range" id="speedSlider" min="100" max="900" value="500">
+        <span>slow</span>
+        <span>↔</span>
+        <span>fast</span>
+      </div>
+
+      <div class="step-info" id="stepInfo">Position: — | Step: 0 / 12</div>
+    </div>
+
+    <!-- Mode comparison -->
+    <div class="def-grid" style="margin-top:1.5rem; margin-bottom:0.8rem">
+      <div class="def-card">
+        <span class="def-tag tag-param">parameter</span>
+        <div>
+          <div class="def-term">mode='same'</div>
+          <div class="def-text">Controls the output array length. Click each mode below to understand the difference.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mode-row">
+      <div class="mode-box" onclick="selectMode('full', this)">
+        <div class="mode-name full">mode='full'</div>
+        <p>Includes all partial overlaps at edges. Output is <em>longer</em> than input.</p>
+        <div class="mode-len" style="color:var(--accent5)">100 + 5 − 1 = <strong>104 values</strong></div>
+      </div>
+      <div class="mode-box active" onclick="selectMode('same', this)">
+        <div class="mode-name same">mode='same' ← used here</div>
+        <p>Output is same length as input. Best for plotting all signals together.</p>
+        <div class="mode-len" style="color:var(--accent)">always <strong>100 values</strong></div>
+      </div>
+      <div class="mode-box" onclick="selectMode('valid', this)">
+        <div class="mode-name valid">mode='valid'</div>
+        <p>Only positions where kernel fully fits inside. Shorter output.</p>
+        <div class="mode-len" style="color:var(--accent2)">100 − 5 + 1 = <strong>96 values</strong></div>
+      </div>
+    </div>
+
+    <div class="interactive-box" style="margin-top:1rem">
+      <h3>ℹ mode explanation</h3>
+      <div id="modeExplain" class="def-text" style="color:var(--muted); font-size:0.88rem; line-height:1.7">
+        <strong style="color:var(--accent)">mode='same'</strong> — You're plotting true_signal (100 values), noisy_signal (100 values), and smoothed_signal on the same graph. If smoothed_signal had 96 or 104 values, the x-axis positions wouldn't match and lines would be misaligned. <code>mode='same'</code> forces output to stay exactly 100 values.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── SECTION 6 — LIVE CHART ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06 —</span>
+      <span class="section-title">Live Chart — See it all together</span>
+    </div>
+
+    <div class="chart-wrap">
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted)">noise std:</span>
+        <input type="range" id="chartStdSlider" min="2" max="25" value="10" style="width:110px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--accent3)" id="chartStdVal">10</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);margin-left:1rem">window size:</span>
+        <input type="range" id="chartWinSlider" min="3" max="21" step="2" value="5" style="width:110px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--accent3)" id="chartWinVal">5</span>
+        <button class="btn" id="chartRegenBtn" style="margin-left:auto">🎲 new signal</button>
+      </div>
+      <canvas id="mainChart" height="220"></canvas>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4ade80;"></div>true signal (flat at 90)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#60a5fa;"></div>noisy signal</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div>smoothed (convolved)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <h2>Summary — the full picture</h2>
+    <div class="summary-row">
+      <span class="summary-key">true_signal</span>
+      <span class="summary-val">100 nineties. The "ideal" signal with zero noise — perfectly flat at 90.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">np.random.normal</span>
+      <span class="summary-val">100 random numbers from a bell curve centered at 0, spread ±10. This simulates noise.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">noisy_signal</span>
+      <span class="summary-val">true_signal + noise. A wiggly line that jiggles around 90.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">kernel [0.2×5]</span>
+      <span class="summary-val">Recipe of weights that add up to 1. Equal weights = simple average.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">np.convolve</span>
+      <span class="summary-val">Slides the kernel across the signal. At each position: multiply 5 values × weights, sum → write smoothed value.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">mode='same'</span>
+      <span class="summary-val">Output stays 100 values so all 3 lines align on the same graph.</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">end result</span>
+      <span class="summary-val">smoothed_signal is calmer — closer to the true flat 90 line because random noise partially cancels out when averaged.</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── BELL CURVE ───────────────────────────────────────────────────────
+function drawBell(canvasId, std, labelId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 500;
+  const H = 120;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  const mean = 0;
+  const xMin = -40, xMax = 40;
+  const pad = 28;
+
+  function gauss(x) {
+    return Math.exp(-0.5 * ((x - mean) / std) ** 2);
+  }
+  function toPixel(x, y) {
+    const px = pad + (x - xMin) / (xMax - xMin) * (W - pad * 2);
+    const py = H - pad - y * (H - pad * 2) * 0.9;
+    return [px, py];
+  }
+
+  // Fill
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const x = xMin + (xMax - xMin) * i / 200;
+    const [px, py] = toPixel(x, gauss(x));
+    i === 0 ? ctx.moveTo(px, H - pad) : null;
+    ctx.lineTo(px, py);
+  }
+  ctx.lineTo(...toPixel(xMax, 0));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(96,165,250,0.08)';
+  ctx.fill();
+
+  // Shade ±1 std
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const x = -std + (std * 2) * i / 200;
+    const [px, py] = toPixel(x, gauss(x));
+    i === 0 ? ctx.moveTo(px, H - pad) : null;
+    ctx.lineTo(px, py);
+  }
+  ctx.lineTo(...toPixel(std, 0));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(96,165,250,0.18)';
+  ctx.fill();
+
+  // Curve
+  ctx.beginPath();
+  for (let i = 0; i <= 400; i++) {
+    const x = xMin + (xMax - xMin) * i / 400;
+    const [px, py] = toPixel(x, gauss(x));
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.strokeStyle = '#60a5fa';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Axis
+  ctx.beginPath();
+  ctx.moveTo(pad, H - pad);
+  ctx.lineTo(W - pad, H - pad);
+  ctx.strokeStyle = '#252a3a';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Labels
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#4b5563';
+  ctx.textAlign = 'center';
+  [[-30,'−30'],[-20,'−20'],[-10,'−10'],[0,'0'],[10,'+10'],[20,'+20'],[30,'+30']].forEach(([v,lbl]) => {
+    const [px] = toPixel(v, 0);
+    ctx.fillText(lbl, px, H - pad + 13);
+  });
+
+  // ±std markers
+  const [s1l] = toPixel(-std, 0);
+  const [s1r] = toPixel(std, 0);
+  ctx.strokeStyle = '#4ade80';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  [s1l, s1r].forEach(x => {
+    ctx.beginPath();
+    ctx.moveTo(x, pad);
+    ctx.lineTo(x, H - pad);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // Center
+  const [cx] = toPixel(0, 0);
+  ctx.beginPath();
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(cx, pad); ctx.lineTo(cx, H - pad);
+  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.setLineDash([]);
+
+  if (labelId) {
+    document.getElementById(labelId).textContent = `Bell curve: mean=0, std=${std} — 68% of noise between −${std} and +${std}`;
+  }
+}
+
+drawBell('bellCanvas', 10, 'bellLabel');
+document.getElementById('stdSlider').addEventListener('input', function() {
+  const v = +this.value;
+  document.getElementById('stdLabel').textContent = v;
+  drawBell('bellCanvas', v, 'bellLabel');
+});
+
+// ─── KERNEL BUILDER ───────────────────────────────────────────────────
+let currentKernelType = 'uniform';
+let currentWinSize = 5;
+
+function makeKernel(type, size) {
+  let weights = [];
+  if (type === 'uniform') {
+    weights = Array(size).fill(1 / size);
+  } else if (type === 'gaussian') {
+    const center = Math.floor(size / 2);
+    const sigma = size / 6;
+    weights = Array.from({length: size}, (_, i) => Math.exp(-0.5 * ((i - center) / sigma) ** 2));
+    const sum = weights.reduce((a, b) => a + b, 0);
+    weights = weights.map(w => w / sum);
+  } else if (type === 'triangle') {
+    const center = Math.floor(size / 2);
+    weights = Array.from({length: size}, (_, i) => center + 1 - Math.abs(i - center));
+    const sum = weights.reduce((a, b) => a + b, 0);
+    weights = weights.map(w => w / sum);
+  }
+  return weights;
+}
+
+const kernelDescs = {
+  uniform: 'Every neighbour gets equal weight. Simple average — clean and fair.',
+  gaussian: 'Center neighbours matter more, edge ones less. Smoother result, preserves peaks better.',
+  triangle: 'Weights ramp up to the center then back down. Between uniform and gaussian.'
+};
+
+function renderKernelVis() {
+  const weights = makeKernel(currentKernelType, currentWinSize);
+  const vis = document.getElementById('kernelVis');
+  const center = Math.floor(currentWinSize / 2);
+  vis.innerHTML = weights.map((w, i) => `
+    <div class="k-box ${i === center ? 'center' : ''}">
+      <span class="k-val">${w.toFixed(2)}</span>
+      <span class="k-pct">${(w * 100).toFixed(0)}%</span>
+    </div>
+  `).join('') + `<span class="k-sum">= 1.0 ✓</span>`;
+  document.getElementById('kernelDesc').textContent = kernelDescs[currentKernelType];
+}
+
+document.querySelectorAll('.k-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.k-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentKernelType = this.dataset.ktype;
+    renderKernelVis();
+  });
+});
+
+document.getElementById('winSlider').addEventListener('input', function() {
+  currentWinSize = +this.value;
+  document.getElementById('winVal').textContent = currentWinSize;
+  renderKernelVis();
+});
+
+renderKernelVis();
+
+// ─── STEP-BY-STEP CONVOLUTION DEMO ───────────────────────────────────
+const DEMO_LEN = 12;
+let demoSignal = [];
+let demoKernel = [0.2, 0.2, 0.2, 0.2, 0.2];
+let demoOutput = [];
+let demoStep = 0;
+let autoTimer = null;
+
+function randNormal(mean, std) {
+  const u1 = Math.random(), u2 = Math.random();
+  const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  return mean + std * z;
+}
+
+function genDemoSignal() {
+  demoSignal = Array.from({length: DEMO_LEN}, () => Math.round(90 + randNormal(0, 8)));
+  demoOutput = Array(DEMO_LEN).fill(null);
+  demoStep = 0;
+  renderDemo();
+  document.getElementById('mathBreakdown').innerHTML = 'Press <strong style="color:var(--accent)">Step →</strong> to start the animation.';
+  document.getElementById('stepInfo').textContent = `Position: — | Step: 0 / ${DEMO_LEN}`;
+}
+
+function convolveAt(signal, kernel, pos) {
+  const half = Math.floor(kernel.length / 2);
+  let result = 0;
+  let terms = [];
+  for (let k = 0; k < kernel.length; k++) {
+    const sIdx = pos - half + k;
+    const val = (sIdx >= 0 && sIdx < signal.length) ? signal[sIdx] : 0;
+    result += val * kernel[k];
+    terms.push({val, weight: kernel[k], idx: sIdx});
+  }
+  return {result: Math.round(result * 100) / 100, terms};
+}
+
+function renderDemo() {
+  const half = Math.floor(demoKernel.length / 2);
+  const sigArr = document.getElementById('signalArr');
+  const kArr = document.getElementById('kernelArr');
+  const outArr = document.getElementById('outputArr');
+
+  sigArr.innerHTML = demoSignal.map((v, i) => {
+    const inWindow = demoStep > 0 && i >= (demoStep - 1 - half) && i <= (demoStep - 1 + half);
+    return `<div class="arr-cell ${inWindow ? 'kernel-active' : ''}">${v}</div>`;
+  }).join('');
+
+  kArr.innerHTML = demoKernel.map((v, i) => {
+    const isCenter = i === half;
+    return `<div class="arr-cell highlight" style="${isCenter ? 'border-color:var(--accent2);' : ''}">${v.toFixed(1)}</div>`;
+  }).join('');
+
+  outArr.innerHTML = demoOutput.map((v, i) => {
+    const isActive = i === demoStep - 1;
+    return `<div class="arr-cell output-cell ${isActive ? 'active-out' : ''}">${v !== null ? v : '?'}</div>`;
+  }).join('');
+}
+
+function stepDemo() {
+  if (demoStep >= DEMO_LEN) {
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btnPlay').textContent = '▶ Auto-play';
+    return;
+  }
+  const pos = demoStep;
+  const {result, terms} = convolveAt(demoSignal, demoKernel, pos);
+  demoOutput[pos] = result;
+  demoStep++;
+
+  renderDemo();
+
+  // Math breakdown
+  const mathEl = document.getElementById('mathBreakdown');
+  const termStr = terms.map(t =>
+    `<span class="mul-pair">${t.val}×${t.weight.toFixed(1)}</span>`
+  ).join(' <span class="plus">+</span> ');
+  mathEl.innerHTML = `<span class="step-line">position [${pos}]:</span>  ${termStr}  <span class="plus">=</span>  <span class="eq-result">${result}</span>`;
+
+  document.getElementById('stepInfo').textContent = `Position: [${pos}] | Step: ${demoStep} / ${DEMO_LEN}`;
+}
+
+document.getElementById('btnStep').addEventListener('click', stepDemo);
+document.getElementById('btnReset').addEventListener('click', () => {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btnPlay').textContent = '▶ Auto-play';
+  demoOutput = Array(DEMO_LEN).fill(null);
+  demoStep = 0;
+  renderDemo();
+  document.getElementById('mathBreakdown').innerHTML = 'Press <strong style="color:var(--accent)">Step →</strong> to start.';
+  document.getElementById('stepInfo').textContent = `Position: — | Step: 0 / ${DEMO_LEN}`;
+});
+document.getElementById('btnRegen').addEventListener('click', () => {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btnPlay').textContent = '▶ Auto-play';
+  genDemoSignal();
+});
+document.getElementById('btnPlay').addEventListener('click', function() {
+  if (autoTimer) {
+    clearInterval(autoTimer); autoTimer = null;
+    this.textContent = '▶ Auto-play';
+    return;
+  }
+  if (demoStep >= DEMO_LEN) { demoStep = 0; demoOutput = Array(DEMO_LEN).fill(null); renderDemo(); }
+  this.textContent = '⏸ Pause';
+  const speed = 1000 - +document.getElementById('speedSlider').value;
+  autoTimer = setInterval(() => {
+    stepDemo();
+    if (demoStep >= DEMO_LEN) {
+      clearInterval(autoTimer); autoTimer = null;
+      document.getElementById('btnPlay').textContent = '▶ Auto-play';
+    }
+  }, speed);
+});
+
+genDemoSignal();
+
+// ─── MODE EXPLANATION ─────────────────────────────────────────────────
+const modeTexts = {
+  same: `<strong style="color:var(--accent)">mode='same'</strong> — Output stays exactly 100 values. Best for plotting: all 3 signals (true, noisy, smoothed) line up on the x-axis. This is what you use in practice.`,
+  full: `<strong style="color:var(--accent5)">mode='full'</strong> — Includes all partial overlaps at edges where the kernel hangs off the signal. Output is 104 values (100 + 5 − 1). Longer than input. You'd need to trim it before plotting alongside other signals.`,
+  valid: `<strong style="color:var(--accent2)">mode='valid'</strong> — Only positions where the kernel fully fits inside the signal, no hanging off edges. Output is 96 values (100 − 5 + 1). Shorter. Cleaner edge behavior but misaligned with original signal on a plot.`
+};
+
+function selectMode(mode, el) {
+  document.querySelectorAll('.mode-box').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('modeExplain').innerHTML = modeTexts[mode];
+}
+
+// ─── MAIN LIVE CHART ─────────────────────────────────────────────────
+let chartSignal = [];
+let chartStd = 10;
+let chartWin = 5;
+
+function genChartSignal() {
+  chartSignal = Array.from({length: 100}, () => 90 + randNormal(0, chartStd));
+}
+
+function uniformKernel(size) {
+  return Array(size).fill(1 / size);
+}
+
+function convolve(signal, kernel) {
+  const n = signal.length;
+  const k = kernel.length;
+  const half = Math.floor(k / 2);
+  return signal.map((_, pos) => {
+    let sum = 0;
+    for (let j = 0; j < k; j++) {
+      const sIdx = pos - half + j;
+      const v = (sIdx >= 0 && sIdx < n) ? signal[sIdx] : 90;
+      sum += v * kernel[j];
+    }
+    return sum;
+  });
+}
+
+function drawMainChart() {
+  const canvas = document.getElementById('mainChart');
+  const W = canvas.offsetWidth || 800;
+  const H = 220;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  const trueSignal = Array(100).fill(90);
+  const kernel = uniformKernel(chartWin);
+  const smoothed = convolve(chartSignal, kernel);
+
+  const padL = 42, padR = 16, padT = 16, padB = 28;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const allVals = [...chartSignal, ...smoothed, ...trueSignal];
+  const minV = Math.min(...allVals) - 5;
+  const maxV = Math.max(...allVals) + 5;
+
+  function toXY(i, v) {
+    return [
+      padL + (i / 99) * plotW,
+      padT + plotH - ((v - minV) / (maxV - minV)) * plotH
+    ];
+  }
+
+  // Grid
+  ctx.strokeStyle = '#1c2030';
+  ctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const y = padT + (g / 4) * plotH;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+    const val = maxV - (g / 4) * (maxV - minV);
+    ctx.fillStyle = '#4b5563';
+    ctx.font = '9px IBM Plex Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(val), padL - 4, y + 3);
+  }
+
+  // Draw line helper
+  function drawLine(data, color, width) {
+    ctx.beginPath();
+    data.forEach((v, i) => {
+      const [x, y] = toXY(i, v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  // Noisy (thin)
+  drawLine(chartSignal, 'rgba(96,165,250,0.5)', 1);
+  // True (dashed)
+  ctx.setLineDash([6, 4]);
+  drawLine(trueSignal, '#4ade80', 1.5);
+  ctx.setLineDash([]);
+  // Smoothed
+  drawLine(smoothed, '#f97316', 2.5);
+
+  // X axis labels
+  ctx.fillStyle = '#4b5563';
+  ctx.font = '9px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  [0, 25, 50, 75, 99].forEach(i => {
+    const [x] = toXY(i, minV);
+    ctx.fillText(i, x, H - padB + 14);
+  });
+}
+
+genChartSignal();
+drawMainChart();
+
+document.getElementById('chartStdSlider').addEventListener('input', function() {
+  chartStd = +this.value;
+  document.getElementById('chartStdVal').textContent = chartStd;
+  genChartSignal();
+  drawMainChart();
+});
+document.getElementById('chartWinSlider').addEventListener('input', function() {
+  chartWin = +this.value;
+  document.getElementById('chartWinVal').textContent = chartWin;
+  drawMainChart();
+});
+document.getElementById('chartRegenBtn').addEventListener('click', () => {
+  genChartSignal();
+  drawMainChart();
+});
+
+// Redraw on resize
+window.addEventListener('resize', () => {
+  drawBell('bellCanvas', +document.getElementById('stdSlider').value, 'bellLabel');
+  drawMainChart();
+});
+</script>
+</body>
+</html>
