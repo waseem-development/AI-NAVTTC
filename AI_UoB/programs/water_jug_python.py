@@ -1,6 +1,5 @@
 LIMIT = 1000
-capacityOfJugA = 0
-capacityOfJugB = 0
+capacityOfJugA = capacityOfJugB = 0
 
 def displayStatus(stepNumber, a, b):
     print(f"{'':18}{stepNumber:<10}{a:<10}{b:<10}")
