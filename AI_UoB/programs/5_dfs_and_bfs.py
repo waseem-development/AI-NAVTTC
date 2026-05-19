@@ -15,7 +15,7 @@ class Graph:
     def remove_edge(self, src, dest):
         if((0 <= src < self.size) and (0 <= dest < self.size)):
             self.mat[src][dest] = 0
-            self.mat[dest][src] = 0  # ← fixed bug (was src,dest twice)
+            self.mat[dest][src] = 0
         else:
             print("Invalid Edge")
 
