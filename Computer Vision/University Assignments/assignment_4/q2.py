@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 def img_filter(img, kernel):
-    filtered = cv2.filter2D(img, -1, kernel) / 1/16
+    filtered = cv2.filter2D(img, -1, kernel)
     return filtered
 
 print("1) fruit.png \n2) grayscale_cat.jpg \n3) japan_street.jpg \n4) lena.png \n5) noisy.jpg")
