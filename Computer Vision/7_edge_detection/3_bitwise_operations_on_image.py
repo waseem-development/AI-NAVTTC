@@ -56,8 +56,8 @@ import numpy as np
 img1 = np.zeros((300,300), dtype="uint8")
 img2 = np.zeros((300,300), dtype="uint8")
 
-cv2.circle(img1, (150, 150), 100, 255, -1)
-cv2.rectangle(img2, (100,100), (250, 250), 255, -1)
+cv2.circle(img1, (150, 150), 100, 255, -1) # -1 means fill this shape 
+cv2.rectangle(img2, (100,100), (250, 250), 255, -1) # -1 means fill this shape 
 
 bitwise_and = cv2.bitwise_and(img1, img2)
 bitwise_or = cv2.bitwise_or(img1, img2)
