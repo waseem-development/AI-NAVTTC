@@ -2,35 +2,23 @@ import cv2
 import numpy as np
 
 img = cv2.imread("./Images/white_bg.jpeg")
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-blur = cv2.GaussianBlur(img, (3,3), 0)
+blur = cv2.GaussianBlur(gray, (3,3), 0)
 
-sobel_x_kernel = np.array([[-1,-2,-1],
-                             [ 0, 0, 0],
-                             [ 1, 2, 1]], dtype=np.float32)
+# x-direction
+gx = cv2.Sobel(blur, cv2.CV_32F, 1, 0, ksize=3)
 
-sobel_y_kernel = np.array([[-1,0,1],
-                             [-2,0,2],
-                             [-1,0,1]], dtype=np.float32)
+# y-direction
+gy = cv2.Sobel(blur, cv2.CV_32F, 0, 1, ksize=3)
 
-gx = cv2.filter2D(blur, cv2.CV_32F, sobel_x_kernel)
-gy = cv2.filter2D(blur, cv2.CV_32F, sobel_y_kernel)
-
-# magnitude = np.sqrt(gx**2, gy**2)
 magnitude = cv2.magnitude(gx, gy)
 magnitude = cv2.convertScaleAbs(magnitude)
 
-print(f"magnitude: {magnitude}")
 cv2.imshow("Original", img)
-cv2.imshow("Gaussian Blur", blur)
 cv2.imshow("Sobel X", cv2.convertScaleAbs(gx))
 cv2.imshow("Sobel Y", cv2.convertScaleAbs(gy))
-cv2.imshow("Sobel Edge", magnitude)
-while True:
-    key = cv2.waitKey(1) & 0xFF
-    if key == 27:
-        break
-    
+cv2.imshow("Magnitude", magnitude)
+
+cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-
