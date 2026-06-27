@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-def correlated2d_manual(f,h):
+def correlated2d_manual(f,h): # h = kernel, f = image
     """G(i,j) = sum_k sum_l h[k,l] * f(i+k, j+l) --- No Flip"""
     n = h.shape[0] // 2                         # kernel half width
     f_padded = np.pad(f, n, mode="constant")    # zero-pad the border
@@ -14,12 +14,16 @@ def correlated2d_manual(f,h):
             out[i, j] = np.sum(region * h)     # direct overlay, dot product
     return out
 
-
+# cv2.GaussianBlur() # 
+# cv2.medianBlur() #
 img = cv2.imread("./Images/japan_street.jpg", cv2.IMREAD_GRAYSCALE)
+cv2.blur(img, (3,3)) # box filter
 kernel = np.ones((3,3))
 print("start")
 filtered_img = correlated2d_manual(img, kernel)
 print("done")
+cv2.namedWindow("Original", cv2.WINDOW_NORMAL)
+cv2.namedWindow("Filtered", cv2.WINDOW_NORMAL)
 cv2.imshow("Original", img)
 cv2.imshow("Filtered", filtered_img)
 while True:

@@ -25,7 +25,7 @@ sharpening_kernel = np.array([
 
 # Sobel Kernel X
 sobel_x_kernel = np.array([[1, 0, -1],
-                           [1, 0, -1],
+                           [1, 0, -2],
                            [1, 0, -1]])
 
 # Sobel Kernel Y
