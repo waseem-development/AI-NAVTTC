@@ -1,0 +1,65 @@
+[
+  {
+    "name": "astronaut",
+    "shape": [
+      512,
+      512,
+      3
+    ],
+    "dtype": "uint8",
+    "is_gray": false,
+    "min": 0,
+    "max": 255,
+    "mean": 114.6
+  },
+  {
+    "name": "chelsea",
+    "shape": [
+      300,
+      451,
+      3
+    ],
+    "dtype": "uint8",
+    "is_gray": false,
+    "min": 0,
+    "max": 231,
+    "mean": 115.31
+  },
+  {
+    "name": "coffee",
+    "shape": [
+      400,
+      600,
+      3
+    ],
+    "dtype": "uint8",
+    "is_gray": false,
+    "min": 0,
+    "max": 255,
+    "mean": 98.62
+  },
+  {
+    "name": "camera",
+    "shape": [
+      512,
+      512
+    ],
+    "dtype": "uint8",
+    "is_gray": true,
+    "min": 0,
+    "max": 255,
+    "mean": 129.06
+  },
+  {
+    "name": "coins",
+    "shape": [
+      303,
+      384
+    ],
+    "dtype": "uint8",
+    "is_gray": true,
+    "min": 1,
+    "max": 252,
+    "mean": 96.86
+  }
+]

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1. Image Data Foundations — Understanding Images as Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/course.css">
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">≡</button>
+<div class="scrim" id="scrim"></div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <a href="README.html" class="brand">
+      <span class="course-index">IMAGE DATA ANALYSIS · 01 / 05</span>
+      <span class="course-title">Understanding Images as Data</span>
+    </a>
+
+    <div class="file-picker">
+      <a href="01-image-data-foundations.html" class="current">1. Foundations</a>
+      <a href="02-image-eda-and-statistics.html">2. EDA &amp; statistics</a>
+      <a href="03-image-cleaning-and-preprocessing.html">3. Cleaning &amp; preprocessing</a>
+      <a href="04-feature-engineering-and-ml.html">4. Features &amp; ML</a>
+      <a href="05-real-world-project.html">5. Real-world project</a>
+    </div>
+
+    <nav class="toc">
+      <a class="nav-link" href="#what-is-an-image">1. What is an image?</a>
+      <a class="nav-link" href="#dims">2. 2D vs 3D arrays</a>
+      <a class="nav-link" href="#pixel-values">3. Pixel values</a>
+      <a class="nav-link" href="#dtypes">4. Image data types</a>
+      <a class="nav-link" href="#libraries">5. How Python sees an image</a>
+      <a class="nav-link" href="#inspection">6. First image inspection</a>
+      <a class="nav-link" href="#visualization">7. Visualization</a>
+      <a class="nav-link" href="#mini-project">8. Mini project</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      Course 1 of 5 · ~30–40 min<br>
+      Images: scikit-image sample data
+    </div>
+  </aside>
+
+  <main>
+    <div class="content">
+
+      <p class="eyebrow-file">FILE 1 OF 5</p>
+      <h1 class="page-title">Understanding Images as Data</h1>
+      <p class="page-dek">Before you can analyze an image dataset, you need to stop seeing images as "pictures" and start seeing them as grids of numbers. This file rebuilds that intuition from zero — no computer vision background assumed.</p>
+
+      <!-- ============================================================ -->
+      <section class="block" id="what-is-an-image">
+        <h2><span class="num">01</span> What exactly is an image?</h2>
+        <p class="lede">To a person, a photo is a scene. To a computer, it is a table of numbers with no idea what a "cat" or a "sky" is. Everything you'll do in this course sits on top of that one fact.</p>
+
+        <div class="term">
+          <div class="term-head"><span class="term-word">pixel</span></div>
+          <div class="term-body">
+            <div class="term-row"><div class="term-label">simple explanation</div><p>A pixel is one tiny colored square. Zoom into any digital photo far enough and it dissolves into a grid of these squares.</p></div>
+            <div class="term-row"><div class="term-label">technical definition</div><p>A pixel ("picture element") is the smallest addressable unit of a digital image — a single value (grayscale) or set of values (color) that the image array stores at one grid position.</p></div>
+            <div class="term-row"><div class="term-label">analogy</div><p>Think of a stadium mosaic display: thousands of individually-colored panels that only form a picture when you step back. Each panel is one pixel.</p></div>
+            <div class="term-row"><div class="term-label">when it's useful</div><p>Every single image operation — brightness, blur, resizing, feature extraction — is really just math applied to pixel values.</p></div>
+            <div class="term-row"><div class="term-label">when it's not the right lens</div><p>Thinking "pixel by pixel" doesn't help when you want to reason about shapes, objects, or textures — for that you need groups of pixels, which is where later sections (gradients, HOG, convolution) come in.</p></div>
+          </div>
+        </div>
+
+        <p>The interactive grid below is a real 8×8 patch cropped from a photograph — not a mock-up. Hover over any square to see the exact numbers the computer stores for that one pixel.</p>
+
+        <div class="pixel-grid-wrap">
+          <div>
+            <div id="pixelGrid" class="pixel-grid" style="grid-template-columns: repeat(8, 34px);"></div>
+            <p style="font-size:12px;color:var(--text-faint);margin-top:8px;">Source patch, magnified from <span class="tip">the astronaut photo<span class="tip-bubble">A public-domain photograph shipped as scikit-image's standard sample image, used throughout this course.</span></span> below.</p>
+          </div>
+          <div class="pixel-readout" id="pixelReadout">
+            <div class="pr-title">HOVER A PIXEL</div>
+            <div class="pr-val">—</div>
+          </div>
+          <div>
+            <button class="copy-btn" id="toggleColorMode" style="position:static;">show grayscale values</button>
+          </div>
+        </div>
+
+        <figure class="fig">
+          <img src="assets/images/astronaut_with_box.png" alt="Full photograph with a small amber rectangle marking the 8x8 region used for the pixel grid above" loading="lazy">
+          <figcaption><span>The amber box marks exactly where that 8×8 patch was cropped from.</span><span>scikit-image sample: "astronaut"</span></figcaption>
+        </figure>
+
+        <p>So an image is fundamentally: <strong>Image → Pixels → Numbers.</strong> A photograph is a big grid; each grid cell holds one or more numbers; and those numbers are all a computer ever sees.</p>
+
+        <h3>The vocabulary you need before going further</h3>
+
+        <div class="term">
+          <div class="term-head"><span class="term-word">channel</span></div>
+          <div class="term-body">
+            <div class="term-row"><div class="term-label">simple explanation</div><p>A channel is one "layer" of color information stacked behind each pixel. A grayscale image has 1 channel (just brightness). A color image usually has 3 (red, green, blue).</p></div>
+            <div class="term-row"><div class="term-label">technical definition</div><p>A channel is a 2D slice of an image array holding one component of the pixel's color model, stacked along a third array axis.</p></div>
+            <div class="term-row"><div class="term-label">analogy</div><p>Like three transparent colored sheets (red, green, blue) laid on top of each other — stack them and you get full color; look at one alone and you get a grayscale-like intensity map of just that color.</p></div>
+            <div class="term-row"><div class="term-label">when it's useful</div><p>Whenever you need to know why a color image's shape ends in 3, or why some operations (grayscale conversion, HSV analysis) explicitly reduce or reorganize channels.</p></div>
+            <div class="term-row"><div class="term-label">when it's not useful</div><p>For genuinely grayscale sensors (X-ray, thermal, some microscopy) there's often only one meaningful channel — forcing 3 channels on that data adds nothing.</p></div>
+          </div>
+        </div>
+
+        <div class="pair">
+          <div class="box beginner">
+            <span class="box-label">RGB</span>
+            <p>Red, Green, Blue — the order most tools (Matplotlib, Pillow, scikit-image) expect. Each channel typically ranges 0–255 for 8-bit images.</p>
+          </div>
+          <div class="box important">
+            <span class="box-label">BGR</span>
+            <p>Blue, Green, Red — the same three numbers, reversed order. This is OpenCV's default when it loads an image, purely for historical reasons.</p>
+          </div>
+        </div>
+
+        <div class="box mistake">
+          <span class="box-label">⚠ common mistake</span>
+          <p>Loading an image with <code class="inline">cv2.imread()</code> (which returns BGR) and then displaying it with <code class="inline">plt.imshow()</code> (which assumes RGB) without converting first. The colors come out looking wrong — blues and reds swapped — not because the data is corrupted, but because the two libraries disagree on channel order.</p>
+        </div>
+
+        <p>A few more terms you'll see constantly, defined briefly here and used precisely for the rest of the course:</p>
+
+        <table class="data-table">
+          <thead><tr><th>term</th><th>meaning</th></tr></thead>
+          <tbody>
+            <tr><td>resolution</td><td>The image's width × height in pixels — e.g. 512×512. Higher resolution means more detail, but also more data to process.</td></tr>
+            <tr><td>grayscale</td><td>An image with a single intensity channel per pixel — no color, only "how bright."</td></tr>
+            <tr><td>alpha channel</td><td>An optional 4th channel storing per-pixel transparency (common in PNGs). Rarely relevant for standard photo analysis unless you specifically need transparency.</td></tr>
+            <tr><td>bit depth</td><td>How many bits are used per channel value. 8-bit → values 0–255. 16-bit → values 0–65,535 (common in medical/scientific imaging).</td></tr>
+            <tr><td>image dtype</td><td>The NumPy data type storing those values — <code class="inline">uint8</code>, <code class="inline">float32</code>, etc. Covered fully in Section 4.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="dims">
+        <h2><span class="num">02</span> 2D vs 3D image arrays</h2>
+        <p class="lede">Once you accept that an image is a NumPy array, the very first thing worth checking about any image is its <code class="inline">.shape</code> — because that one line tells you whether you're looking at grayscale or color data, and how big it is.</p>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Reads the array's dimensions directly from its metadata — no need to load the whole image again.</p></div>
+          <div class="ce-row"><span class="ce-tag">why we need it</span><p>Shape mismatches are the single most common source of crashes in image pipelines (e.g. feeding a grayscale image where a model expects 3 channels).</p></div>
+          <div class="code-wrap">
+            <pre class="code-block"><span style="color:#7FA8D9">import</span> numpy <span style="color:#7FA8D9">as</span> np
+<span style="color:#7FA8D9">from</span> skimage <span style="color:#7FA8D9">import</span> data, color
+
+gray = data.camera()                 <span style="color:#6B7280"># a built-in grayscale sample</span>
+rgb  = data.astronaut()              <span style="color:#6B7280"># a built-in color sample</span>
+
+<span style="color:#7FA8D9">print</span>(gray.shape)
+<span style="color:#7FA8D9">print</span>(rgb.shape)</pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="output-row"><span class="ce-tag">expected output</span><pre>(512, 512)
+(512, 512, 3)</pre></div>
+          <div class="ce-row"><span class="ce-tag">interpretation</span><p><code class="inline">(512, 512)</code> means height=512, width=512, and — because there's no third number — a single implicit channel: grayscale. <code class="inline">(512, 512, 3)</code> means the same spatial size, but now with 3 stacked channels (R, G, B) per pixel.</p></div>
+          <div class="ce-row"><span class="ce-tag">common mistake</span><p>Reading the shape as (width, height) — it's actually <strong>(height, width, channels)</strong> in NumPy/OpenCV/scikit-image convention, the opposite order from how Pillow reports <code class="inline">.size</code>.</p></div>
+        </div>
+
+        <div class="box important">
+          <span class="box-label">important</span>
+          <p>"2D array" and "grayscale image" are the same thing here. "3D array" doesn't mean a hologram — the third dimension is <em>channels</em>, not depth. A single color photo is a 3D array; a whole folder of color photos loaded into one array would be 4D: <code class="inline">(num_images, height, width, channels)</code>.</p>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="pixel-values">
+        <h2><span class="num">03</span> Pixel values</h2>
+        <p class="lede">Knowing the shape tells you the grid size. Knowing the values tells you what's actually drawn on that grid.</p>
+
+        <p>For the common case of an 8-bit grayscale image:</p>
+        <div class="formula-card">
+          <div class="f-name">grayscale intensity scale</div>
+          <div class="f-math">0 = black  →  255 = white</div>
+          <p class="f-note">Everything in between is a shade of gray. A value of 128 is roughly middle gray.</p>
+        </div>
+
+        <p>Color images extend this idea per channel — a pixel of <code class="inline">(255, 0, 0)</code> in RGB is pure red, <code class="inline">(0,0,0)</code> is black, <code class="inline">(255,255,255)</code> is white.</p>
+
+        <p>You almost never eyeball a 512×512 grid of numbers directly. Instead, you summarize it with a handful of NumPy calls:</p>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Computes five quick summary statistics for an entire image array in one pass each.</p></div>
+          <div class="ce-row"><span class="ce-tag">why we need it</span><p>These five numbers are the fastest possible health-check for any image — before you even look at it, you already know its size, its numeric type, and its rough brightness range.</p></div>
+          <div class="code-wrap">
+            <pre class="code-block"><span style="color:#7FA8D9">import</span> numpy <span style="color:#7FA8D9">as</span> np
+<span style="color:#7FA8D9">from</span> skimage <span style="color:#7FA8D9">import</span> data
+
+image = data.camera()
+
+<span style="color:#7FA8D9">print</span>(image.shape)
+<span style="color:#7FA8D9">print</span>(image.dtype)
+<span style="color:#7FA8D9">print</span>(image.min())
+<span style="color:#7FA8D9">print</span>(image.max())
+<span style="color:#7FA8D9">print</span>(image.mean())</pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="output-row"><span class="ce-tag">expected output</span><pre>(512, 512)
+uint8
+0
+255
+129.06</pre></div>
+          <div class="ce-row"><span class="ce-tag">interpretation</span><p>Line by line: a 512×512 grayscale image, stored as unsigned 8-bit integers, using the full possible range (0 to 255) with an average brightness of about 129 — a fairly mid-toned image overall.</p></div>
+          <div class="ce-row"><span class="ce-tag">when this is useful</span><p>Run this on every image (or a sample) when you first receive a dataset — it instantly flags images that are pure black, pure white, or oddly narrow-range.</p></div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="dtypes">
+        <h2><span class="num">04</span> Image data types</h2>
+        <p class="lede">The same pixel value can be stored in different numeric formats, and mixing them by accident is one of the most common (and confusing) bugs in image work.</p>
+
+        <table class="data-table">
+          <thead><tr><th>dtype</th><th>typical range</th><th>where you'll see it</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">uint8</code></td><td>0 – 255 (integers)</td><td>How images are loaded from disk by default (JPEG, PNG, etc.)</td></tr>
+            <tr><td><code class="inline">float32</code></td><td>commonly 0.0 – 1.0</td><td>What neural networks expect as input</td></tr>
+            <tr><td><code class="inline">float64</code></td><td>commonly 0.0 – 1.0</td><td>What many scikit-image functions return internally</td></tr>
+          </tbody>
+        </table>
+
+        <div class="box important">
+          <span class="box-label">important — two different operations, often confused</span>
+          <p><strong>Changing dtype</strong> (the container) and <strong>changing value range</strong> (the contents) are not the same thing, and doing one without the other silently breaks images.</p>
+        </div>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Two different transformations that both "look like normalization" but behave very differently.</p></div>
+          <div class="code-wrap">
+            <pre class="code-block">image = data.camera()               <span style="color:#6B7280"># uint8, values 0-255</span>
+
+<span style="color:#6B7280"># (A) changes the CONTAINER only — values are still 0-255</span>
+as_float = image.astype(np.float32)
+
+<span style="color:#6B7280"># (B) changes the VALUE RANGE — now scaled to 0.0-1.0</span>
+normalized = image / <span style="color:#F2A73B">255.0</span></pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="output-row"><span class="ce-tag">expected output</span><pre>as_float.dtype   -> float32   as_float.max()   -> 255.0
+normalized.dtype -> float64   normalized.max() -> 1.0</pre></div>
+          <div class="ce-row"><span class="ce-tag">interpretation</span><p><code class="inline">.astype()</code> alone just relabels the numbers as floats — 255 stays 255.0, still "bright white" on a 0-255 scale. Dividing by 255 actually rescales every value into the 0–1 range that most ML models expect.</p></div>
+          <div class="ce-row"><span class="ce-tag">common mistake</span><p>Calling <code class="inline">.astype(np.float32)</code> and assuming the image is now "normalized" for a neural network. It isn't — the values are still 0–255, just in a different container. This one mix-up quietly wrecks model training more often than almost any other preprocessing bug.</p></div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="libraries">
+        <h2><span class="num">05</span> How Python sees an image</h2>
+        <p class="lede">Every library you'll touch in this course ultimately hands you back the same thing: a NumPy array. The differences are in convenience functions, default channel order, and what kind of operations each one specializes in.</p>
+
+        <div class="formula-card">
+          <div class="f-name">the pipeline underneath everything</div>
+          <div class="f-math">Image → NumPy array → numbers → features</div>
+          <p class="f-note">Whichever library loads the image, this is where it always ends up. Feature extraction (File 4) is just further math on these same numbers.</p>
+        </div>
+
+        <table class="data-table">
+          <thead><tr><th>library</th><th>reach for it when…</th></tr></thead>
+          <tbody>
+            <tr><td><strong>OpenCV</strong> (<code class="inline">cv2</code>)</td><td>You need speed, video, real-time processing, or classical CV operations (thresholding, morphology, contours). Loads as BGR.</td></tr>
+            <tr><td><strong>scikit-image</strong></td><td>You want scientific-Python-friendly functions with sensible defaults (RGB order, float outputs), built-in sample datasets, and access to feature extractors like HOG and LBP used in File 4.</td></tr>
+            <tr><td><strong>PIL / Pillow</strong></td><td>You need simple loading, saving, format conversion, resizing, or basic annotation without a heavier CV toolkit.</td></tr>
+          </tbody>
+        </table>
+
+        <p>In practice, real projects mix all three: Pillow to load a weird file format, OpenCV for fast preprocessing, scikit-image for feature extraction and metrics — converting between them is just NumPy array conversions.</p>
+
+        <div class="source">
+          <span class="source-icon">📚</span>
+          <span>Source: <a href="https://scikit-image.org/docs/stable/" target="_blank" rel="noopener">scikit-image documentation</a> · <a href="https://docs.opencv.org/" target="_blank" rel="noopener">OpenCV documentation</a></span>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="inspection">
+        <h2><span class="num">06</span> First image inspection</h2>
+        <p class="lede">Five OpenCV functions cover the vast majority of "just let me look at this image" needs.</p>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Loads a file from disk into a NumPy array (BGR order), and demonstrates the format-conversion, resize, and save round-trip.</p></div>
+          <div class="code-wrap">
+            <pre class="code-block"><span style="color:#7FA8D9">import</span> cv2
+
+img = cv2.imread(<span style="color:#F2A73B">"cat.jpg"</span>)              <span style="color:#6B7280"># load -> BGR uint8 array</span>
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   <span style="color:#6B7280"># drop color -> single channel</span>
+small = cv2.resize(gray, (<span style="color:#F2A73B">128</span>, <span style="color:#F2A73B">128</span>))       <span style="color:#6B7280"># force a fixed size</span>
+cv2.imwrite(<span style="color:#F2A73B">"cat_small_gray.png"</span>, small)  <span style="color:#6B7280"># save back to disk</span>
+<span style="color:#6B7280"># cv2.imshow("preview", img)          # opens a native window (scripts only)</span></pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="ce-row"><span class="ce-tag">interpretation</span><p><code class="inline">imread</code> returns <code class="inline">None</code> (not an error) if the path is wrong — a check you'll rely on constantly in File 3 for detecting corrupted files.</p></div>
+          <div class="ce-row"><span class="ce-tag">when NOT to use <code class="inline">cv2.imshow</code></span><p>It requires a GUI backend and doesn't work in Jupyter notebooks or headless servers — use Matplotlib's <code class="inline">imshow</code> instead in those environments (next section).</p></div>
+        </div>
+
+        <p>The scikit-image equivalents, for comparison:</p>
+        <div class="code-wrap">
+          <pre class="code-block"><span style="color:#7FA8D9">from</span> skimage <span style="color:#7FA8D9">import</span> io, color, transform
+
+img = io.imread(<span style="color:#F2A73B">"cat.jpg"</span>)                       <span style="color:#6B7280"># RGB order, not BGR</span>
+gray = color.rgb2gray(img)                     <span style="color:#6B7280"># returns float64, 0.0-1.0</span>
+small = transform.resize(gray, (<span style="color:#F2A73B">128</span>, <span style="color:#F2A73B">128</span>))</pre>
+          <button class="copy-btn">copy</button>
+        </div>
+        <div class="box mistake">
+          <span class="box-label">⚠ common mistake</span>
+          <p>scikit-image's <code class="inline">rgb2gray</code> returns floats in 0.0–1.0, while OpenCV's <code class="inline">cvtColor</code> returns <code class="inline">uint8</code> in 0–255. Comparing or combining outputs from the two libraries without checking dtype and range first produces images that look "washed out" or all-black for no obvious reason.</p>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="visualization">
+        <h2><span class="num">07</span> Visualization</h2>
+        <p class="lede">Matplotlib is the workhorse for actually looking at images and arrays inside notebooks and scripts.</p>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Displays a color image and a grayscale image side by side, correctly.</p></div>
+          <div class="code-wrap">
+            <pre class="code-block"><span style="color:#7FA8D9">import</span> matplotlib.pyplot <span style="color:#7FA8D9">as</span> plt
+
+fig, axes = plt.subplots(<span style="color:#F2A73B">1</span>, <span style="color:#F2A73B">2</span>, figsize=(<span style="color:#F2A73B">8</span>, <span style="color:#F2A73B">4</span>))
+
+axes[<span style="color:#F2A73B">0</span>].imshow(rgb_image)
+axes[<span style="color:#F2A73B">0</span>].set_title(<span style="color:#F2A73B">"Color"</span>)
+axes[<span style="color:#F2A73B">0</span>].axis(<span style="color:#F2A73B">"off"</span>)
+
+axes[<span style="color:#F2A73B">1</span>].imshow(gray_image, cmap=<span style="color:#F2A73B">"gray"</span>)
+axes[<span style="color:#F2A73B">1</span>].set_title(<span style="color:#F2A73B">"Grayscale"</span>)
+axes[<span style="color:#F2A73B">1</span>].axis(<span style="color:#F2A73B">"off"</span>)
+
+plt.tight_layout()
+plt.show()</pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="ce-row"><span class="ce-tag">common mistake</span><p>Forgetting <code class="inline">cmap="gray"</code> on a 2D array. Matplotlib defaults to a yellow-purple "viridis" colormap for single-channel data — the image isn't corrupted, it's just being colorized by default.</p></div>
+        </div>
+
+        <div class="fig-row" style="--cols:2;">
+          <figure class="fig">
+            <img src="assets/images/astronaut_rgb.png" alt="Color photograph displayed with plt.imshow(image), showing natural colors" loading="lazy">
+            <figcaption><span><code class="inline">plt.imshow(image)</code></span></figcaption>
+          </figure>
+          <figure class="fig">
+            <img src="assets/images/astronaut_gray.png" alt="Same photograph converted to grayscale and displayed with cmap=gray, showing true black-to-white tones" loading="lazy">
+            <figcaption><span><code class="inline">plt.imshow(gray, cmap="gray")</code></span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ============================================================ -->
+      <section class="block" id="mini-project">
+        <h2><span class="num">08</span> First mini project</h2>
+        <p class="lede">A small, real "dataset" — five classic sample images bundled with scikit-image, deliberately mixed in shape and color mode, just like a messy real dataset would be.</p>
+
+        <div class="fig-row" style="--cols:5;">
+          <figure class="fig"><img src="assets/images/mini_astronaut.png" alt="astronaut sample image, color photograph"><figcaption><span>astronaut</span></figcaption></figure>
+          <figure class="fig"><img src="assets/images/mini_chelsea.png" alt="chelsea sample image, a tabby cat, color photograph"><figcaption><span>chelsea</span></figcaption></figure>
+          <figure class="fig"><img src="assets/images/mini_coffee.png" alt="coffee sample image, a cup of coffee, color photograph"><figcaption><span>coffee</span></figcaption></figure>
+          <figure class="fig"><img src="assets/images/mini_camera.png" alt="camera sample image, a grayscale photograph of a man with a camera on a tripod"><figcaption><span>camera (gray)</span></figcaption></figure>
+          <figure class="fig"><img src="assets/images/mini_coins.png" alt="coins sample image, grayscale photograph of scattered coins"><figcaption><span>coins (gray)</span></figcaption></figure>
+        </div>
+
+        <div class="code-explain">
+          <div class="ce-row"><span class="ce-tag">what it does</span><p>Loads all five images, prints their shape/dtype/min/max/mean, and separates the color ones from the grayscale ones.</p></div>
+          <div class="code-wrap">
+            <pre class="code-block"><span style="color:#7FA8D9">from</span> skimage <span style="color:#7FA8D9">import</span> data
+
+images = {
+    <span style="color:#F2A73B">"astronaut"</span>: data.astronaut(),
+    <span style="color:#F2A73B">"chelsea"</span>:   data.chelsea(),
+    <span style="color:#F2A73B">"coffee"</span>:    data.coffee(),
+    <span style="color:#F2A73B">"camera"</span>:    data.camera(),
+    <span style="color:#F2A73B">"coins"</span>:     data.coins(),
+}
+
+<span style="color:#7FA8D9">for</span> name, img <span style="color:#7FA8D9">in</span> images.items():
+    kind = <span style="color:#F2A73B">"RGB"</span> <span style="color:#7FA8D9">if</span> img.ndim == <span style="color:#F2A73B">3</span> <span style="color:#7FA8D9">else</span> <span style="color:#F2A73B">"grayscale"</span>
+    <span style="color:#7FA8D9">print</span>(f<span style="color:#F2A73B">"{name:10s} shape={str(img.shape):15s} dtype={img.dtype} kind={kind} mean={img.mean():.1f}"</span>)</pre>
+            <button class="copy-btn">copy</button>
+          </div>
+          <div class="output-row"><span class="ce-tag">expected output</span><pre>astronaut  shape=(512, 512, 3)   dtype=uint8 kind=RGB       mean=114.6
+chelsea    shape=(300, 451, 3)   dtype=uint8 kind=RGB       mean=115.3
+coffee     shape=(400, 600, 3)   dtype=uint8 kind=RGB       mean=98.6
+camera     shape=(512, 512)      dtype=uint8 kind=grayscale mean=129.1
+coins      shape=(303, 384)      dtype=uint8 kind=grayscale mean=96.9</pre></div>
+          <div class="ce-row"><span class="ce-tag">interpretation</span><p>Even five "clean" sample images already differ in resolution, aspect ratio, and color mode. A real dataset pulled from the internet will vary far more — this is exactly what Section 2 (dataset-level EDA, File 2) exists to catch systematically.</p></div>
+        </div>
+
+        <p>The chart below plots the mean brightness of each image — real output from the code above, not a mock chart:</p>
+        <figure class="fig">
+          <img src="assets/charts/mini_dataset_brightness.png" alt="Bar chart comparing mean pixel intensity across the five sample images: astronaut 114.6, chelsea 115.3, coffee 98.6, camera 129.1, coins 96.9" loading="lazy">
+          <figcaption><span>Generated with Matplotlib from the exact values printed above.</span></figcaption>
+        </figure>
+
+        <div class="box beginner">
+          <span class="box-label">try it yourself</span>
+          <p>Swap in your own image folder: replace the dictionary values with <code class="inline">cv2.imread(path)</code> calls (remembering the BGR caveat from Section 6) and re-run the same loop. The shape/dtype/mean check works identically on any images.</p>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <p style="font-family:var(--font-serif); font-size:20px; color:var(--text); text-align:center; margin:56px 0 8px;">You now understand what image data actually is.</p>
+      <p style="text-align:center; color:var(--text-faint); font-size:14px;">Next: turn that understanding into a systematic way of exploring an entire dataset.</p>
+
+      <div class="page-nav">
+        <span></span>
+        <a class="next" href="02-image-eda-and-statistics.html">
+          <span class="pn-label">NEXT — FILE 2</span>
+          <span class="pn-title">Image EDA &amp; Statistics →</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/course.js"></script>
+<script>
+  // Interactive pixel grid — real 8x8 RGB patch cropped from the astronaut photo.
+  const rgbPatch = [[[111,88,57],[114,92,61],[121,100,72],[131,110,81],[134,111,81],[136,112,81],[138,118,83],[140,119,86]],[[126,105,73],[127,110,75],[134,116,82],[139,115,84],[141,119,90],[144,121,93],[142,122,90],[144,120,92]],[[138,122,89],[138,124,91],[142,126,91],[145,128,94],[148,127,100],[151,130,100],[148,128,94],[143,124,90]],[[146,127,97],[147,131,98],[149,128,97],[150,131,96],[149,131,98],[151,129,95],[149,129,99],[147,128,100]],[[154,137,107],[155,137,105],[160,137,109],[159,140,105],[152,133,101],[154,136,101],[151,135,102],[149,130,97]],[[161,142,111],[163,141,116],[161,140,111],[161,140,109],[159,138,108],[160,141,110],[155,135,102],[149,127,98]],[[167,151,115],[165,147,116],[166,147,116],[170,148,121],[166,146,119],[160,141,109],[157,136,108],[151,128,101]],[[173,159,126],[176,160,134],[174,156,129],[170,152,122],[166,144,114],[159,140,114],[152,133,99],[151,129,101]]];
+  const grayPatch = [[90,94,102,112,113,114,119,121],[107,111,117,117,121,123,123,123],[123,124,126,129,129,132,129,125],[128,132,130,132,132,131,131,130],[138,138,139,141,134,137,136,131],[143,143,142,142,140,142,136,129],[151,148,148,150,148,142,138,130],[159,161,157,153,146,142,134,131]];
+
+  let grayMode = false;
+  const grid = document.getElementById("pixelGrid");
+  const readout = document.getElementById("pixelReadout");
+
+  function renderGrid() {
+    grid.innerHTML = "";
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const cell = document.createElement("div");
+        cell.className = "pixel-cell";
+        if (grayMode) {
+          const v = grayPatch[r][c];
+          cell.style.background = `rgb(${v},${v},${v})`;
+          cell.addEventListener("mouseenter", () => {
+            readout.innerHTML = `<div class="pr-title">ROW ${r}, COL ${c}</div>
+              <div class="pr-val"><span class="swatch" style="background:rgb(${v},${v},${v})"></span>value = ${v}</div>
+              <div style="color:var(--text-faint);font-size:12px;">single-channel grayscale · 0–255</div>`;
+          });
+        } else {
+          const [rr, gg, bb] = rgbPatch[r][c];
+          cell.style.background = `rgb(${rr},${gg},${bb})`;
+          cell.addEventListener("mouseenter", () => {
+            readout.innerHTML = `<div class="pr-title">ROW ${r}, COL ${c}</div>
+              <div class="pr-val"><span class="swatch" style="background:rgb(${rr},${gg},${bb})"></span>R=${rr} G=${gg} B=${bb}</div>
+              <div style="color:var(--text-faint);font-size:12px;">3-channel RGB pixel</div>`;
+          });
+        }
+        grid.appendChild(cell);
+      }
+    }
+  }
+  renderGrid();
+
+  document.getElementById("toggleColorMode").addEventListener("click", (e) => {
+    grayMode = !grayMode;
+    e.target.textContent = grayMode ? "show RGB values" : "show grayscale values";
+    readout.innerHTML = `<div class="pr-title">HOVER A PIXEL</div><div class="pr-val">—</div>`;
+    renderGrid();
+  });
+</script>
+</body>
+</html>

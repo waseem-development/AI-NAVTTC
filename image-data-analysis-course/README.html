@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Data Analysis — A Beginner-to-Intermediate Course</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/course.css" />
+    <style>
+      main {
+        padding: 0;
+      }
+      .landing {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 90px 32px 120px;
+      }
+      .landing .kicker {
+        font-family: var(--font-mono);
+        color: var(--accent);
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+      .landing h1 {
+        font-family: var(--font-serif);
+        font-size: 48px;
+        line-height: 1.12;
+        margin: 0 0 20px;
+        max-width: 16ch;
+      }
+      .landing .dek {
+        font-size: 18px;
+        color: var(--text-dim);
+        max-width: 60ch;
+        margin-bottom: 48px;
+      }
+      .file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 56px;
+      }
+      .file-card {
+        display: grid;
+        grid-template-columns: 60px 1fr auto;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 24px;
+        text-decoration: none;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: var(--radius);
+      }
+      .file-card + .file-card {
+        margin-top: -1px;
+      }
+      .file-card:hover {
+        border-color: var(--accent);
+        z-index: 1;
+        position: relative;
+      }
+      .file-card .fnum {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        color: var(--accent);
+      }
+      .file-card h3 {
+        margin: 0 0 4px;
+        font-family: var(--font-sans);
+        font-size: 17px;
+        color: var(--text);
+      }
+      .file-card p {
+        margin: 0;
+        font-size: 13.5px;
+        color: var(--text-dim);
+      }
+      .file-card .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+      .prereq {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      .pill {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        padding: 5px 11px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        color: var(--text-dim);
+      }
+      h2.section-h {
+        font-family: var(--font-serif);
+        font-size: 22px;
+        margin: 56px 0 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell" style="grid-template-columns: 1fr">
+      <main>
+        <div class="landing">
+          <p class="kicker">A COMPLETE, INTERACTIVE COURSE</p>
+          <h1>Image Data Analysis, from Pixels to Predictions</h1>
+          <p class="dek">
+            You already know Python, NumPy, Pandas, and the basics of ML. This
+            course teaches the part in between: how to look at an unfamiliar
+            image dataset, understand what's actually in it, decide what to do
+            about it, and justify every decision with statistics, math, and
+            reasoning — not memorized OpenCV calls.
+          </p>
+
+          <div class="prereq">
+            <span class="pill">Python</span>
+            <span class="pill">NumPy / Pandas</span>
+            <span class="pill">Matplotlib</span>
+            <span class="pill">basic ML concepts</span>
+          </div>
+
+          <h2 class="section-h">The five files</h2>
+          <div class="file-list">
+            <a class="file-card" href="01-image-data-foundations.html">
+              <span class="fnum">01</span>
+              <span
+                ><h3>Understanding Images as Data</h3>
+                <p>
+                  What a pixel, channel, and array shape actually mean — and how
+                  Python libraries see an image.
+                </p></span
+              >
+              <span class="arrow">open</span>
+            </a>
+            <a class="file-card" href="02-image-eda-and-statistics.html">
+              <span class="fnum">02</span>
+              <span
+                ><h3>Image EDA &amp; Statistics</h3>
+                <p>
+                  Dataset-level exploration, brightness/contrast/sharpness,
+                  histograms, and the math (vectors, distance, convolution,
+                  gradients) behind it.
+                </p></span
+              >
+              <span class="arrow">open</span>
+            </a>
+            <a
+              class="file-card"
+              href="03-image-cleaning-and-preprocessing.html"
+            >
+              <span class="fnum">03</span>
+              <span
+                ><h3>From Messy Images to Model-Ready Data</h3>
+                <p>
+                  Cleaning, resizing, normalization, contrast enhancement,
+                  denoising, augmentation, and data leakage.
+                </p></span
+              >
+              <span class="arrow">open</span>
+            </a>
+            <a class="file-card" href="04-feature-engineering-and-ml.html">
+              <span class="fnum">04</span>
+              <span
+                ><h3>Turning Images Into Useful Features</h3>
+                <p>
+                  Raw pixels, HOG, texture and color features, PCA, KNN,
+                  evaluation, error analysis, and the bridge to CNNs.
+                </p></span
+              >
+              <span class="arrow">open</span>
+            </a>
+            <a class="file-card" href="05-real-world-project.html">
+              <span class="fnum">05</span>
+              <span
+                ><h3>End-to-End Project: Cat Breed Classification</h3>
+                <p>
+                  One complete pipeline, decision guides, a classic-mistakes
+                  list, and a report template for write-ups.
+                </p></span
+              >
+              <span class="arrow">open</span>
+            </a>
+          </div>
+
+          <h2 class="section-h">How to use this</h2>
+          <p style="color: #d7d6d0; max-width: 64ch">
+            Go in order — each file assumes only what came before it. Every code
+            block shows what it does, why you need it, the exact code, real
+            output, an interpretation, and a common mistake to avoid. Every
+            image and chart is generated from real data (scikit-image's standard
+            sample images), not placeholders.
+          </p>
+          <p
+            style="
+              color: var(--text-faint);
+              font-size: 13.5px;
+              margin-top: 40px;
+            "
+          >
+            Open any file directly in a browser — no build step, no server
+            required.
+          </p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

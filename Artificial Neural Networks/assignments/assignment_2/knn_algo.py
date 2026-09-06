@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import cv2
 import os
 
@@ -7,7 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-dataset_path = "./datasets/cats"
+dataset_path = "./dataset/cats"
 size = 64
 
 X, y = [], []
@@ -38,7 +37,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
-knn = KNeighborsClassifier(n_neighbors=5)
+knn = KNeighborsClassifier(n_neighbors=5, metric="euclidean")
 knn.fit(X_train, y_train)
 
 y_prediction = knn.predict(X_test)
