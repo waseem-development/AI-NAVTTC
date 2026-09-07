@@ -1,4 +1,4 @@
-# import cv2
+# import cv2 
 
 # # 1. Read the image
 # img = cv2.imread("./images/panda.jpeg")
