@@ -266,7 +266,7 @@ This journal is one corner of a bigger space. My portfolio at **[codebypaxto.com
 
 > This repo is part of my **NAVTTC AI training program**, **university coursework**, and self-study from sources like **MIT OpenCourseWare** and **Stanford Online**. The work here is personal, hands-on, and built from scratch.
 
-**Waseem** (*Paxto*): Full-Stack Web Developer & Machine Learning Learner<br>Co-Founder at [ShalStack](https://shalstack.com)
+**Hafiz Waseem Ahmed** S/o Abdul Karim (*Paxto*)<br>Full-Stack Web Developer & Machine Learning Learner<br>Co-Founder at [ShalStack](https://shalstack.com)<br><sub>🎓 Bachelor of Science in Computer Science, University of Balochistan</sub>
 <br>
 📍 Quetta, Balochistan, Pakistan 🇵🇰
 
