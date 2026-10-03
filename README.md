@@ -19,6 +19,8 @@
 ![Focus](https://img.shields.io/badge/🎯%20FOCUS-ML%20·%20ANN%20·%20CV%20·%20GNN-be185d?style=for-the-badge&labelColor=0b0f17)
 ![Location](https://img.shields.io/badge/📍%20QUETTA-PAKISTAN-818cf8?style=for-the-badge&labelColor=0b0f17)
 
+[![Portfolio](https://img.shields.io/badge/🌐%20PORTFOLIO-CODEBYPAXTO.COM-be185d?style=for-the-badge&labelColor=0b0f17)](https://www.codebypaxto.com)
+
 </div>
 
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:5755a7,50:be185d,100:2dd4bf&height=3" width="100%"/>
@@ -210,13 +212,61 @@ The path ahead is long. This repo documents the walk, honestly, including what I
 
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:2dd4bf,50:be185d,100:5755a7&height=3" width="100%"/>
 
+## &nbsp;`[` 🌐 `]` &nbsp; The CodeByPaxto World
+
+This journal is one corner of a bigger space. My portfolio at **[codebypaxto.com](https://www.codebypaxto.com)** is where the finished work, services, and the live learning roadmap live.
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**🚀 [Work](https://www.codebypaxto.com/work)**<br>
+<sub>Live production projects, web applications, and AI systems.</sub>
+<div align="right"><code>⌝</code></div>
+
+</td>
+<td width="50%" valign="top">
+
+**🧪 [Learning](https://www.codebypaxto.com/learning)**<br>
+<sub>Interactive roadmap: Deep Learning, Computer Vision, GNNs, and future NLP directions. <i>Now vs Next.</i></sub>
+<div align="right"><code>⌝</code></div>
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+**🛠️ [Services](https://www.codebypaxto.com/services)**<br>
+<sub>Full-Stack Web Development, Python Data Analytics, and Python & low-code AI automations.</sub>
+<div align="right"><code>⌝</code></div>
+
+</td>
+<td width="50%" valign="top">
+
+**👤 [About](https://www.codebypaxto.com/about)**<br>
+<sub>The person behind Paxto, Co-Founder at ShalStack, and the core philosophy.</sub>
+<div align="right"><code>⌝</code></div>
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+
+[![Visit](https://img.shields.io/badge/VISIT%20THE%20PORTFOLIO-www.codebypaxto.com-5755a7?style=for-the-badge&logo=nextdotjs&logoColor=white&labelColor=0b0f17)](https://www.codebypaxto.com)
+[![Contact](https://img.shields.io/badge/CONTACT%20%26%20INQUIRIES-be185d?style=for-the-badge&labelColor=0b0f17)](https://www.codebypaxto.com/contact)
+
+</div>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:5755a7,50:be185d,100:2dd4bf&height=3" width="100%"/>
+
 ## &nbsp;`[` 🤝 `]` &nbsp; About
 
 <div align="center">
 
 > This repo is part of my **NAVTTC AI training program**, **university coursework**, and self-study from sources like **MIT OpenCourseWare** and **Stanford Online**. The work here is personal, hands-on, and built from scratch.
 
-**Waseem** (*Paxto*): Full-Stack Web Developer & Machine Learning Learner
+**Waseem** (*Paxto*): Full-Stack Web Developer & Machine Learning Learner<br>Co-Founder at [ShalStack](https://shalstack.com)
 <br>
 📍 Quetta, Balochistan, Pakistan 🇵🇰
 
@@ -225,7 +275,9 @@ The path ahead is long. This repo documents the walk, honestly, including what I
 <br>
 
 [![GitHub](https://img.shields.io/badge/FOLLOW%20ON%20GITHUB-5755a7?style=for-the-badge&logo=github&logoColor=white&labelColor=0b0f17)](https://github.com/waseem-development)
-[![CodeByPaxto](https://img.shields.io/badge/CODEBYPAXTO-be185d?style=for-the-badge&logo=python&logoColor=white&labelColor=0b0f17)](https://github.com/waseem-development)
+[![Portfolio](https://img.shields.io/badge/PORTFOLIO-CODEBYPAXTO.COM-be185d?style=for-the-badge&logo=nextdotjs&logoColor=white&labelColor=0b0f17)](https://www.codebypaxto.com)
+[![LinkedIn](https://img.shields.io/badge/LINKEDIN-2dd4bf?style=for-the-badge&logo=linkedin&logoColor=0b0f17&labelColor=0b0f17)](https://www.linkedin.com/in/hafiz-waseem-ahmed-50a4b2347/)
+[![ShalStack](https://img.shields.io/badge/SHALSTACK-818cf8?style=for-the-badge&labelColor=0b0f17)](https://shalstack.com)
 
 </div>
 
